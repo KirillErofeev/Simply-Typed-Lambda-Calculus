@@ -4,6 +4,8 @@ import Control.Monad.State.Lazy
 import qualified Data.Map as Map (lookup, empty)
 import Data.Map (Map(..), insert)
 import Types
+--import Data.Either (fromRight)
+import Data.Either.Unwrap (fromRight)
 
 type Context = Map Symbol Type
 
@@ -87,6 +89,59 @@ typeOf' (Add x y)   = do
 
 typeOf' (Mult x y) = typeOf' $ Add x y
 
+typeOf' (Pair t0 t1) = do
+    et0 <- typeOf' t0
+    et1 <- typeOf' t1
+    return $ case (et0 >> et1) of
+        Right _ -> Right $ PairT (fromRight et0) (fromRight et1)
+        Left m  -> Left m
+
+typeOf' (Fst t) = do
+    et <- typeOf' t
+    return $ case et of 
+        Right (PairT tl _) -> Right tl
+        Right x             -> errorExpAct (PairT A B) x
+        x                   -> x
+
+typeOf' (Snd t) = do
+    et <- typeOf' t
+    return $ case et of 
+        Right (PairT _ tr) -> Right tr
+        Right x             -> errorExpAct (PairT A B) x
+        x                   -> x
+
+typeOf' (Cons te tl) = do
+    ete <- typeOf' te
+    etl <- typeOf' tl
+    return $ case (ete, etl) of
+        (Right t, Right (List t')) -> if t == t'
+                                      then Right $ List t
+                                      else errorExpAct t' t
+        (Right t, Right t')        -> errorExpAct (List t) t'
+        (x, y)                     -> x >> y
+
+typeOf' (Nil t)   = return $ Right $ List t
+
+typeOf' (IsNil t) = do
+    tl <- typeOf' t
+    return $ case tl of
+        Right (List _) -> Right Bool
+        Right x        -> errorExpAct (List A) x
+        x              -> x
+
+typeOf' (Head t) = do
+    tl <- typeOf' t
+    return $ case tl of
+        Right (List te) -> Right te
+        Right x         -> errorExpAct (List A) x
+        x               -> x
+
+typeOf' (Tail t) = do
+    tl <- typeOf' t
+    return $ case tl of
+        Right (List te) -> Right $ List te
+        Right x         -> errorExpAct (List A) x
+        x               -> x
 -- > typeOf $ Lam "x" Nat $ Add (Sym "x") (Natural 5)
 -- Right (Fun Nat Nat)
 

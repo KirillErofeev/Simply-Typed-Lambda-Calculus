@@ -21,5 +21,6 @@ executable sem1
                      , mtl
                      , primes
                      , containers
+                     , either-unwrap
 
  

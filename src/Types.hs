@@ -38,5 +38,7 @@ data Type
   | PairT Type Type             -- (T1, T2)
   | List Type                   -- [T]
   | A
+  | B
+  | C
   deriving (Eq,Show,Read)
 

@@ -66,3 +66,52 @@ test6 = map typeOf [
                     lams !! 0 *.* n5
                    ]
 
+pnb  = Pair bt n5
+pbb  = Pair bt bt
+pnn  = Pair n5 n5
+pnp  = Pair n5 pbb
+ppp  = Pair pnb pbb
+
+test7 = map typeOf [
+                    pnb, pnb, pnn, pnp, ppp
+                   ]
+         
+test8 = map typeOf [
+                    Snd pnb, 
+                    Fst pnb, 
+                    Fst pnn, 
+                    Fst ppp, 
+                    Snd $ Fst ppp, 
+                    
+                    Fst (pnn *.* pnp),
+                    Fst bt,
+                    Snd (lams !! 3)
+                   ]
+
+test9 = map typeOf [
+                    Pair (lams !! 3) bt,
+                    lam x (PairT Bool Nat) $ And (Not (Fst $ Sym x)) (Fst $ Sym x),
+                    lam x (Bool) $ lam y (Nat) $ lam z (Bool) $ Pair (Sym x) (Pair (Sym y) (Sym z)),
+                    (lam x (Bool) $ lam y (Nat) $ lam z (Bool) $ Pair (Sym x) (Pair (Sym y) (Sym z))) *.* bt *.* n5 *.* bt,
+                    lam y (Fun Bool Bool) $ lam z (Bool) $ Pair (Sym y) (Sym z),
+
+                    (lam y (Nat) $ lam z (Bool) $ Pair (Sym x) (Pair (Sym y) (Sym z))) *.* n5 *.* bt,
+                    (lam x (Bool) $ lam y (Nat) $ lam z (Bool) $ Pair (Sym x) (Pair (Sym y) (Sym z))) *.* bt *.* bt *.* bt,
+                    lams !! 2 *.* pnb *.* pnn,
+                    Pair (lams !! 1) (lams !! 7),
+                    pnb *.* pbb
+                   ]
+
+eln = Nil Nat
+elb = Nil Bool
+
+test11 = map typeOf [
+                     eln, elb,
+                     Cons (lams !! 0) (Nil (Fun Bool Bool)),
+                     IsNil $ Cons (lams !! 0) (Nil (Fun Bool Bool)),
+                     Head $ Cons (lams !! 0) (Nil (Fun Bool Bool)),
+                     Tail $ Tail $ Tail $ Head $ Cons (lams !! 0) (Nil (Fun Bool Bool)),
+
+                     IsNil bt,
+                     Cons (lams !! 0) (Nil (Bool))
+                    ]
